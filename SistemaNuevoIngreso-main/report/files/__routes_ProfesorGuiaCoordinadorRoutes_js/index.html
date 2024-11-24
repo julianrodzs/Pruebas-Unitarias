@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Plato - ./routes/ProfesorGuiaCoordinadorRoutes.js</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+
+  <link href="../../assets/css/vendor/morris.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/bootstrap.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/font-awesome.css" rel="stylesheet">
+  <link href="../../assets/css/vendor/codemirror.css" rel="stylesheet">
+  <link href="../../assets/css/plato.css" rel="stylesheet">
+  <link href="../../assets/css/plato-file.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="http://github.com/es-analysis/plato">Plato on Github</a>
+    <ul class="nav navbar-nav">
+      <li>
+        <a href="../../index.html">Report Home</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="jumbotron">
+  <div class="container">
+    <h1>./routes/ProfesorGuiaCoordinadorRoutes.js</h1>
+  </div>
+</div>
+
+<div class="container aggregate-stats">
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Maintainability <a href="http://blogs.msdn.com/b/codeanalysis/archive/2007/11/20/maintainability-index-range-and-meaning.aspx"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="A value between 0 and 100 that represents the relative ease of maintaining the code. A high value means better maintainability." data-original-title="Maintainability Index"  data-container="body"></i></a></h2>
+      <p class="stat">58.47</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Lines of code <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h2>
+      <p class="stat">288</p>
+    </div>
+  </div>
+  <div class="row historical">
+    <div class="col-md-6">
+      <p id="chart_historical_maint" class="chart"></p>
+    </div>
+    <div class="col-md-6">
+      <p id="chart_historical_sloc" class="chart"></p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2 class="header">Difficulty  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="The difficulty measure is related to the difficulty of the program to write or understand." data-original-title="Difficulty" data-container="body"></i></a></h2>
+      <p class="stat">48.06</p>
+    </div>
+    <div class="col-md-6">
+      <h2 class="header">Estimated Errors  <a href="http://en.wikipedia.org/wiki/Halstead_complexity_measures"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Halstead's delivered bugs is an estimate for the number of errors in the implementation." data-original-title="Delivered Bugs" data-container="body"></i></a></h2>
+      <p class="stat">3.42</p>
+    </div>
+  </div>
+</div>
+
+<div class="container charts">
+  <div class="row">
+    <h2 class="header">Function weight</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h3 class="chart-header">By Complexity <a href="http://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="This metric counts the number of distinct paths through a block of code. Lower values are better." data-original-title="Cyclomatic Complexity" data-container="body"></i></a></h3>
+      <div id="fn-by-complexity" class="stat"></div>
+    </div>
+    <div class="col-md-6">
+      <h3 class="chart-header">By SLOC  <i class="icon icon-info-sign" rel="popover" data-placement="top" data-trigger="hover" data-content="Source Lines of Code / Logical Lines of Code" data-original-title="SLOC/LSLOC" data-container="body"></i></h3>
+      <div id="fn-by-sloc" class="stat"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <textarea id="file-source" class="col-md-12">import express from &quot;express&quot;;
+import ExcelJS from &#039;exceljs&#039;;
+import { user } from &quot;../models/userModel.js&quot;;
+import { team } from &quot;../models/teamModel.js&quot;;
+import { consecutive } from &quot;../models/consecutiveModel.js&quot;;
+import { student } from &quot;../models/studentModel.js&quot;;
+const router = express.Router();
+import { Activity } from &quot;../models/activityModel.js&quot;;
+
+router.post(&#039;/CrearActividad&#039;, async (req,response) =&gt; {
+    try{
+        const newActivity = {
+            nombre: req.body.nombre,
+            estado: req.body.estado,
+            semana: req.body.semana,
+            tipo: req.body.tipo,
+            afiche: req.body.afiche,
+            fechaPublicacion: req.body.fechaPublicacion,
+            fecha: req.body.fecha,
+            hora: req.body.hora,
+            modalidad: req.body.modalidad,
+            enlaceReunion: req.body.enlaceReunion,
+            responsables: req.body.responsables,
+            recordatorios: req.body.recordatorios,
+            evidencias: req.body.evidencias,
+            comentarios: req.body.comentarios,
+        };
+
+        const activity = await Activity.create(newActivity);
+
+        return response.status(201).send(activity);
+
+    } catch (error){
+        console.log(error.message);
+        response.status(500).send({message: error.message});
+    }
+
+})
+
+router.post(&#039;/ResponderComentario/:id&#039;, async (req, res)=&gt; {
+    const profe = req.body.user
+    const id = req.params.id
+    const fecha = req.body.date
+    const comment = req.body.idComentario
+    const respuesta = req.body.respuesta
+
+    const resp = {
+        respuesta: respuesta,
+        profesor: `${profe.name} ${profe.lastName} ${profe.secondLastName}`,
+        fecha: fecha
+    }
+
+    try {
+        const result = await Activity.findOneAndUpdate(
+            { _id: id, &quot;comentarios._id&quot;: comment },
+            { 
+                $push: { &quot;comentarios.$.respuestas&quot;: resp }
+            },
+            { new: true }
+        );
+        console.log(result);
+        res.send(result.comentarios);
+    } catch (error) {
+        console.log(error);
+        res.status(500).send(&quot;Error actualizando el comentario.&quot;);
+    }
+})
+
+
+router.get(&#039;/ListaActividades&#039;, async (req, res) =&gt;{
+    try {
+        const result = await Activity.find({})
+        res.send(result)
+    } catch (error) {
+        
+    }
+})
+
+router.post(&#039;/ComentarActividad/:id&#039;, async (req, res)=&gt;{
+    const id = req.params.id
+    console.log(&#039;user&#039;)
+    console.log(req.body.user)
+
+    const comment = {
+        comentario : req.body.comment,
+        profesor: `${req.body.user.name} ${req.body.user.lastName} ${req.body.user.secondLastName}`,
+        fecha: req.body.date,
+        respuestas : []
+    }
+    console.log(&#039;comentario: &#039;)
+    console.log(comment)
+    try{
+        const activity = await Activity.findByIdAndUpdate(
+            id,
+            { $push: { comentarios: comment } },
+            { new: true }  // Esto asegura que se devuelva el documento actualizado
+        );
+
+        console.log(&#039;actividad con el comentario: &#039;)
+        console.log(activity)
+        res.send(activity.comentarios)
+    } catch (error) {
+        
+    }
+})
+
+router.post(&#039;/ModificarActividad/:id&#039;, async (req,response) =&gt; {
+    const id = req.params.id
+    try{
+        if(req.body.estadoA === &quot;Cancelada&quot;){
+            await Activity.findByIdAndUpdate(id,{
+                $set: {fechaCancelacion: new Date()}
+            })
+        }
+        const result = await Activity.findByIdAndUpdate(id,{
+            $set: {
+                nombre: req.body.nombreActividad,
+                estado: req.body.estadoA,
+                justificacion: req.body.justificacion,
+                semana: req.body.semana,
+                tipo: req.body.tipo,
+                afiche: req.body.afiche,
+                fecha: req.body.fecha,
+                hora: req.body.hora,
+                modalidad: req.body.modalidad,
+                responsables: req.body.responsables,
+                recordatorios: req.body.recordatorios,
+                evidencias: req.body.evidencias,
+            }
+        }, {new: true});
+        response.send(result)
+    } catch (error){
+        console.log(error.message);
+        response.status(500).send({message: error.message});
+    }
+
+})
+
+
+router.get(&quot;/ListaProfesores&quot;, async (req, res) =&gt; {
+    const users = await user.find({
+      isAdministrative: false,
+    });
+    res.json(users);
+  });
+
+router.get(&quot;/ListaProfesores/:Profesor&quot;, async (req, res) =&gt; {
+    const nombre = req.params.Profesor;
+    const regex = new RegExp(nombre, &quot;i&quot;); // &quot;i&quot; para case insensitive
+    const profes = await user.find({ name: regex, isAdministrative: false,});
+    res.json(profes);
+  });
+
+  router.post(&#039;/RecuperarProfesor&#039;, async (req,res) =&gt; {
+    const id = req.body.selection
+    try {
+        const result = await user.findById(id)
+        res.send(result)
+    } catch (error) {
+        console.log(error)
+    }
+  })
+
+router.get(&#039;/generarInformeCampus/:Campus&#039;, async (req, res) =&gt; {
+    try {
+        const nombreCampus = req.params.Campus;
+        const students = await student.find({ campus: nombreCampus}).sort(&#039;campus&#039;);
+        const workbook = new ExcelJS.Workbook();
+
+        const worksheet = workbook.addWorksheet(nombreCampus);
+
+        worksheet.columns = [
+            { header: &#039;Carne&#039;, key: &#039;carne&#039;, width: 10 },
+            { header: &#039;Primer Nombre&#039;, key: &#039;name&#039;, width: 15 },
+            { header: &#039;Segundo Nombre&#039;, key: &#039;secondName&#039;, width: 15 },
+            { header: &#039;Primer Apellido&#039;, key: &#039;lastName&#039;, width: 15 },
+            { header: &#039;Segundo Apellido&#039;, key: &#039;secondLastName&#039;, width: 15 },
+            { header: &#039;Email&#039;, key: &#039;email&#039;, width: 25 },
+            { header: &#039;Numero de Telefono&#039;, key: &#039;phoneNumber&#039;, width: 25 },
+            { header: &#039;Campus&#039;, key: &#039;campus&#039;, width: 15 },
+        ];
+
+        worksheet.getRow(1).font = { bold: true };
+
+        students.forEach(student =&gt; {
+            worksheet.addRow([student.carne, student.name, student.secondName, student.lastName, student.secondLastName, student.email, 
+                student.phoneNumber, student.campus]);
+        });
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        res.setHeader(&#039;Content-Type&#039;, &#039;appplication/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8&#039;);
+        res.setHeader(&#039;Content-Disposition&#039;, &#039;attachment; filename=&quot;informeEstudiantes.xlsx&quot;&#039;);
+        res.send(buffer);
+
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send(&#039;Failed to generate Excel file&#039;);
+        
+    }
+});
+
+router.get(&#039;/generarInformeAllCampus&#039;, async (req, res) =&gt; {
+    try {
+        const students = await student.find({}).sort(&#039;campus&#039;);
+
+        const campusGroups = students.reduce((acc, student) =&gt; {
+            if (!acc[student.campus]) {
+                acc[student.campus] = [];
+            }
+            acc[student.campus].push(student);
+            return acc;
+        }, {});
+
+        const workbook = new ExcelJS.Workbook();
+
+        for (let campus in campusGroups) {
+            const worksheet = workbook.addWorksheet(campus); 
+
+            worksheet.columns = [
+                { header: &#039;Carne&#039;, key: &#039;carne&#039;, width: 10 },
+                { header: &#039;Primer Nombre&#039;, key: &#039;name&#039;, width: 15 },
+                { header: &#039;Segundo Nombre&#039;, key: &#039;secondName&#039;, width: 15 },
+                { header: &#039;Primer Apellido&#039;, key: &#039;lastName&#039;, width: 15 },
+                { header: &#039;Segundo Apellido&#039;, key: &#039;secondLastName&#039;, width: 15 },
+                { header: &#039;Email&#039;, key: &#039;email&#039;, width: 25 },
+                { header: &#039;Numero de Telefono&#039;, key: &#039;phoneNumber&#039;, width: 25 },
+                { header: &#039;Campus&#039;, key: &#039;campus&#039;, width: 15 },
+            ];
+
+            worksheet.getRow(1).font = { bold: true };
+
+            campusGroups[campus].forEach(student =&gt; {
+                worksheet.addRow({
+                    carne: student.carne,
+                    name: student.name,
+                    secondName: student.secondName,
+                    lastName: student.lastName,
+                    secondLastName: student.secondLastName,
+                    email: student.email,
+                    phoneNumber: student.phoneNumber,
+                    campus: student.campus
+                });
+            });
+        }
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        res.setHeader(&#039;Content-Type&#039;, &#039;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8&#039;);
+        res.setHeader(&#039;Content-Disposition&#039;, &#039;attachment; filename=&quot;informeEstudiantes.xlsx&quot;&#039;);
+        res.send(buffer);
+    } catch (error) {
+        console.error(&#039;Failed to generate Excel file:&#039;, error);
+        res.status(500).send(&#039;Failed to generate Excel file&#039;);
+    }
+});
+
+  router.get(`/Actividad/:id`, async (req,res) =&gt; {
+    const id = req.params.id
+    try {
+        const result = await Activity.findById(id)
+        res.send(result)
+    } catch (error) {
+        console.log(error) 
+    }
+  })
+  
+router.post(&#039;/Responsables&#039;,async (req, res)=&gt;{
+    const list = req.body.listId
+    let result = []
+    for (let element of list.list) {
+        const aux = await user.findById(element._id)
+        result.push(aux)   
+    }
+    res.send(result)
+})
+
+router.get(&#039;/Responsables/:id&#039;, async (req,res) =&gt;{
+    const id = req.params.id
+    try {
+        const result = await Activity.findById(id)
+        res.send(result.responsables)
+    } catch (error) {
+        console.log(error) 
+
+}})
+
+
+export default router;</textarea>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>.</p>
+  </div>
+</footer>
+
+<script type="text/html" id="complexity-popover-template">
+  <div class="complexity-notice">
+    Complexity : {{ cyclomatic }} <br>
+    Length : {{ halstead.length }} <br>
+    Difficulty : {{ halstead.difficulty.toFixed(2) }} <br>
+    Est # bugs : {{ halstead.bugs.toFixed(2) }}<br>
+  </div>
+</script>
+
+<script type="text/javascript" src="../../assets/scripts/bundles/core-bundle.js"></script>
+<script type="text/javascript" src="../../assets/scripts/bundles/codemirror.js"></script>
+<script type="text/javascript" src="../../assets/scripts/codemirror.markpopovertext.js"></script>
+<script type="text/javascript" src="report.js"></script>
+<script type="text/javascript" src="report.history.js"></script>
+<script type="text/javascript" src="../../assets/scripts/plato-file.js"></script>
+</body>
+</html>
