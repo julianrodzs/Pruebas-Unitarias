@@ -9,3 +9,6 @@ los escenarios de prueba se pueden dividir por los comentarios que hay antes de 
 # Prueba 5
 Los reportes generados con la herramienta se encuentran en la carpeta de reports, hay una carpeta para cada escenario de prueba que vienen siendo los diferentes modulos de rutas
 contienen un index que se puede lanzar con live server y ver los resultados
+
+# Prueba 6
+Los escenarios de la prueba de integración con jest se encuentran en la carpeta Prueba 6, son 4 escenarios de prueba.
